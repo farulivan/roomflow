@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "roomflow",
+  "compatibility_date": "2026-10-19",
+  // A static site: there is no Worker script, so every request is served
+  // straight from the built files.
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths get index.html, so client-side routes such as
+    // /hotels/harborline/orders work on reload and as shared links.
+    "not_found_handling": "single-page-application",
+  },
+  "routes": [{ "pattern": "roomflow.farulivan.com", "custom_domain": true }],
+  // The custom domain is the one public address. Each uploaded version
+  // (a branch build, for example) still gets its own workers.dev URL for
+  // checking a change before it goes live.
+  "workers_dev": false,
+  "preview_urls": true,
+}
