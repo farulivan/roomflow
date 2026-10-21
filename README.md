@@ -9,7 +9,7 @@ A guest-service dashboard for hotel staff. Room service, housekeeping, laundry, 
 ## Features
 
 - **Three hotels, one console.** A hotel switcher scopes everything to one property. The hotel is part of the URL, so a shared link always opens the right one.
-- **Dashboard:** active guests, open orders, revenue today, completed today, average order value and SLA breaches. Also the top services, orders by hour, and a "needs attention" queue.
+- **Dashboard:** today's orders hour by hour, with revenue and average order value; open orders, SLA breaches, active guests and completed orders; a "needs attention" queue; and the top services.
 - **Orders list:**
   - search by guest, order ID or room
   - filters for status, service, payment and overdue orders, which combine
@@ -39,7 +39,7 @@ A guest-service dashboard for hotel staff. Room service, housekeeping, laundry, 
 | [React Router](https://reactrouter.com) v8           | Hotel-scoped routes, list state in the URL, a routed details drawer                          |
 | react-hook-form + [Zod](https://zod.dev) 4           | Form types come from the schema; Zod also checks the stored session and demo settings        |
 | [MSW](https://mswjs.io) v2                           | A mock backend at the network boundary, so the app code is written exactly as for a real API |
-| Recharts                                             | The two dashboard charts, loaded only with the dashboard                                     |
+| Recharts                                             | The orders-by-hour chart, loaded only with the dashboard                                     |
 | `bun test` + Testing Library + happy-dom             | Fast unit, hook and component tests                                                          |
 | Cloudflare Workers                                   | Serves the static build from the edge, on the same platform as the domain                    |
 
@@ -85,7 +85,7 @@ src/
 
 Code depends in one direction: UI → query hooks → API client → domain. The domain imports nothing and holds every business rule, and the mock backend reuses the same functions. That's why the UI and the API can't disagree about which status changes are legal.
 
-Each feature keeps the same file roles: `api.ts` for endpoints, `queries.ts` and `mutations.ts` for data hooks, then components. Components either show data (badges, KPI cards, empty states) or compose a page; they don't fetch on their own.
+Each feature keeps the same file roles: `api.ts` for endpoints, `queries.ts` and `mutations.ts` for data hooks, then components. Components either show data (badges, amounts, empty states) or compose a page; they don't fetch on their own.
 
 The full write-up is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
