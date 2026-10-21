@@ -6,11 +6,12 @@ import { SlaBadge } from "@/components/shared/sla-badge"
 import { StatusBadge } from "@/components/shared/status-badge"
 import type { Order } from "@/domain/order"
 import { isSlaOverdue } from "@/domain/sla"
-import { formatOrderAmount, formatRelativeTime } from "@/lib/format"
+import { formatRelativeTime } from "@/lib/format"
 import { paths } from "@/lib/paths"
 import { cn } from "@/lib/utils"
 
 import { OrderActions } from "./order-actions"
+import { OrderAmount } from "./order-amount"
 
 interface OrderCardListProps {
   orders: Order[]
@@ -18,8 +19,8 @@ interface OrderCardListProps {
 }
 
 const cardTreatment = cn(
-  "relative rounded-lg border border-l-2 border-l-transparent bg-card p-3 transition-colors",
-  "hover:bg-muted/50 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring",
+  "relative rounded-xl border border-l-2 border-l-transparent bg-card p-3 transition-colors",
+  "hover:bg-foreground/[0.03] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring",
   "data-[overdue=true]:border-l-alert data-[overdue=true]:bg-alert/[0.04]"
 )
 
@@ -43,7 +44,7 @@ export function OrderCardList({ orders, now }: OrderCardListProps) {
               <Link
                 to={paths.order(order.hotelId, order.id, location.search)}
                 data-order-link={order.id}
-                className="font-mono text-sm font-medium text-primary after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none"
+                className="font-mono text-sm font-medium text-primary after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none"
               >
                 {order.id}
               </Link>
@@ -64,16 +65,7 @@ export function OrderCardList({ orders, now }: OrderCardListProps) {
                 {order.service}
                 {order.quantity > 1 && ` × ${order.quantity}`}
               </span>
-              <span
-                className={cn(
-                  "font-mono",
-                  order.amount === 0
-                    ? "text-muted-foreground"
-                    : "text-foreground"
-                )}
-              >
-                {formatOrderAmount(order.amount)}
-              </span>
+              <OrderAmount order={order} />
             </div>
             <div className="mt-2 flex items-center justify-between gap-2">
               <span className="text-xs text-muted-foreground">

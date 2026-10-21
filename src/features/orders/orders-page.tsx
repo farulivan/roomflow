@@ -43,7 +43,7 @@ export function OrdersPage() {
           description={`Guest service requests at ${hotel.name}`}
         >
           {query.data && (
-            <span className="font-mono text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground tabular-nums">
               {query.data.total} total
             </span>
           )}
