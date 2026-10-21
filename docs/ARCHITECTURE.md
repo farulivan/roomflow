@@ -135,26 +135,28 @@ Each action carries its UI metadata: label, past-tense label for the toast, inte
 
 - **SLA.** An order breaches its SLA when it stays in `New` longer than its service's target (`SLA_TARGET_MINUTES`): Room Service 10 min, Spa & Massage 15, Housekeeping 20, Extra Bed 20, Laundry 30. Later statuses count as in hand.
 - **Approval.** `initialStatusFor()` sends an Extra Bed request above `EXTRA_BED_CAPACITY` (2) to `Pending Approval` instead of `New`.
+- **Payment follow-up.** `needsPaymentFollowUp()` (`src/domain/payment.ts`) is true while a declined payment still has to be collected: the order isn't cancelled and isn't complimentary. While it holds, `actionsForOrder()` makes Acknowledge and Approve ask for confirmation first; later steps stay one click. It's also the only time the API accepts "Mark payment collected".
 - **Metrics** (`computeMetrics`, "today" = local calendar day):
   - active guests = distinct rooms with a non-cancelled order today
   - open orders = everything not Completed or Cancelled
   - revenue today = paid, non-cancelled orders today
   - average order value = that revenue over the paid orders behind it, with complimentary $0 orders left out
-  - needs attention = SLA breaches, then pending approvals, then failed payments on any non-cancelled order. A completed order whose payment failed still owes money, so it stays listed.
+  - needs attention = SLA breaches, then pending approvals, then orders where `needsPaymentFollowUp()` holds. A completed order whose payment failed still owes money, so it stays listed until the payment is collected.
 
 ## Mock API
 
 MSW intercepts `fetch` in a service worker, so the app is written exactly as it would be against a real backend, and the deployed build ships the same mock. Every route is scoped to a hotel:
 
-| Endpoint                                            | Behavior                                                                                                                                         |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `GET /api/hotels`                                   | The hotels this account can work in                                                                                                              |
-| `GET /api/hotels/:hotelId/orders`                   | Query params `search`, `status`, `service`, `payment`, `sla`, `sort`, `page`, `pageSize`. Returns `{ items, total, page, pageSize, totalPages }` |
-| `GET /api/hotels/:hotelId/orders/:orderId`          | One order, or 404                                                                                                                                |
-| `PATCH /api/hotels/:hotelId/orders/:orderId/status` | Body `{ status, reason? }`; checked against the transition map; 422 with a message when illegal                                                  |
-| `GET /api/hotels/:hotelId/metrics`                  | Dashboard metrics and the needs-attention list                                                                                                   |
-| `POST /api/hotels/:hotelId/demo/orders`             | One realistic incoming order (the live simulation)                                                                                               |
-| `POST /api/demo/reset`                              | Reseeds every hotel                                                                                                                              |
+| Endpoint                                             | Behavior                                                                                                                                         |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /api/hotels`                                    | The hotels this account can work in                                                                                                              |
+| `GET /api/hotels/:hotelId/orders`                    | Query params `search`, `status`, `service`, `payment`, `sla`, `sort`, `page`, `pageSize`. Returns `{ items, total, page, pageSize, totalPages }` |
+| `GET /api/hotels/:hotelId/orders/:orderId`           | One order, or 404                                                                                                                                |
+| `PATCH /api/hotels/:hotelId/orders/:orderId/status`  | Body `{ status, reason? }`; checked against the transition map; 422 with a message when illegal                                                  |
+| `PATCH /api/hotels/:hotelId/orders/:orderId/payment` | Body `{ status: "Paid" }`: records a collected payment; 422 when there is nothing to collect, 400 for any other status                           |
+| `GET /api/hotels/:hotelId/metrics`                   | Dashboard metrics and the needs-attention list                                                                                                   |
+| `POST /api/hotels/:hotelId/demo/orders`              | One realistic incoming order (the live simulation)                                                                                               |
+| `POST /api/demo/reset`                               | Reseeds every hotel                                                                                                                              |
 
 **Tenant isolation.** A second catch-all handler returns 404 for an unknown hotel before any hotel route runs. `src/mocks/db.ts` is one orders table with a `hotelId` column, and every read is scoped to a hotel. An order that belongs to another hotel returns the same 404 as one that doesn't exist, so the API never confirms what another tenant holds. `src/mocks/db.test.ts` covers this.
 
@@ -239,6 +241,7 @@ Zod schemas are the single source of truth, and form types are derived with `z.i
   - optimistic rollback restores only the failed order
   - confirmed actions don't touch the cache before the server answers
   - the shared clock runs one timer
+  - acknowledging an order with a declined payment asks first, and collecting a payment rolls back only that order on failure
   - which actions render for each status
 
 ## Accessibility
