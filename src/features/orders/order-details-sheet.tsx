@@ -37,7 +37,7 @@ import {
 import { paths } from "@/lib/paths"
 import { useNow } from "@/lib/use-now"
 
-import { useCollectPayment } from "./mutations"
+import { useCollectPayment, useIsOrderUpdating } from "./mutations"
 import { OrderActions } from "./order-actions"
 import { useOrder } from "./queries"
 
@@ -62,6 +62,9 @@ function DetailRow({ label, children }: DetailRowProps) {
  */
 function PaymentFollowUp({ order }: { order: Order }) {
   const collectPayment = useCollectPayment()
+  // Shared with the row menu and the footer actions, so a change started
+  // anywhere disables this button too.
+  const isPending = useIsOrderUpdating(order.id)
 
   return (
     <Alert variant="destructive" className="mb-3 border-destructive/30">
@@ -78,10 +81,10 @@ function PaymentFollowUp({ order }: { order: Order }) {
           size="sm"
           variant="outline"
           className="mt-2"
-          disabled={collectPayment.isPending}
-          onClick={() => collectPayment.mutate(order)}
+          disabled={isPending}
+          onClick={() => collectPayment.mutate({ order })}
         >
-          {collectPayment.isPending && <Loader2 className="animate-spin" />}
+          {isPending && <Loader2 className="animate-spin" />}
           Mark payment collected
         </Button>
       </AlertDescription>

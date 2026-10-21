@@ -169,7 +169,7 @@ describe("useCollectPayment", () => {
     const { result, declined, paymentOf } = setupDeclined()
 
     act(() => {
-      result.current.mutate(declined)
+      result.current.mutate({ order: declined })
     })
     await waitFor(() => expect(paymentOf()).toBe("Paid"))
 
@@ -183,7 +183,7 @@ describe("useCollectPayment", () => {
     const { result, declined, paymentOf } = setupDeclined()
 
     act(() => {
-      result.current.mutate(declined)
+      result.current.mutate({ order: declined })
     })
     await waitFor(() => expect(paymentOf()).toBe("Paid"))
 

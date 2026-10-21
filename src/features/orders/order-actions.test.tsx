@@ -77,3 +77,60 @@ describe("OrderActions", () => {
     expect(screen.queryByLabelText("Reason (optional)")).not.toBeInTheDocument()
   })
 })
+
+describe("OrderActions row menu", () => {
+  // Radix marks the page behind an open menu with pointer-events: none;
+  // happy-dom can't resolve the override on the menu itself.
+  const openMenu = async (orderId: string) => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    await user.click(
+      await screen.findByRole("button", { name: `Actions for ${orderId}` })
+    )
+    return screen.findAllByRole("menuitem")
+  }
+
+  test("an open order with a declined payment lists the payment step last", async () => {
+    const order = makeOrder({
+      status: "New",
+      paymentStatus: "Failed",
+      amount: 40,
+    })
+    renderActions(<OrderActions order={order} variant="row" />)
+
+    const items = await openMenu(order.id)
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Acknowledge",
+      "Cancel",
+      "Mark payment collected",
+    ])
+  })
+
+  test("a delivered order still owed keeps a menu with only the payment step", async () => {
+    const order = makeOrder({
+      status: "Completed",
+      paymentStatus: "Failed",
+      amount: 40,
+    })
+    renderActions(<OrderActions order={order} variant="row" />)
+
+    const items = await openMenu(order.id)
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Mark payment collected",
+    ])
+  })
+
+  test("a paid, completed order has no menu at all", async () => {
+    const order = makeOrder({ status: "Completed", paymentStatus: "Paid" })
+    renderActions(
+      <>
+        <span>Row rendered</span>
+        <OrderActions order={order} variant="row" />
+      </>
+    )
+
+    await screen.findByText("Row rendered")
+    expect(
+      screen.queryByRole("button", { name: `Actions for ${order.id}` })
+    ).not.toBeInTheDocument()
+  })
+})

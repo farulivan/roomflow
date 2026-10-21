@@ -22,7 +22,9 @@ interface UpdateOrderStatusInput {
   reason?: string
 }
 
+// Both start with "orders", so useIsOrderUpdating can watch them together.
 const updateStatusKey = ["orders", "update-status"] as const
+const collectPaymentKey = ["orders", "collect-payment"] as const
 
 /** The toast line for a change that failed and was put back. */
 function revertedDescription(error: Error): string {
@@ -117,17 +119,18 @@ export function useCollectPayment() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (order: Order) =>
+    mutationKey: collectPaymentKey,
+    mutationFn: ({ order }: { order: Order }) =>
       ordersApi.collectPayment(order.hotelId, order.id),
 
-    onMutate: async (order) => {
+    onMutate: async ({ order }) => {
       await queryClient.cancelQueries({
         queryKey: ordersKeys.all(order.hotelId),
       })
       writeOrder(queryClient, { ...order, paymentStatus: "Paid" })
     },
 
-    onError: (error, order) => {
+    onError: (error, { order }) => {
       writeOrder(queryClient, order)
       toast.error(`Couldn't record the payment for ${order.id}`, {
         description: revertedDescription(error),
@@ -141,23 +144,24 @@ export function useCollectPayment() {
       track("payment_collected", { orderId: updated.id, outcome: "success" })
     },
 
-    onSettled: (_updated, _error, order) =>
+    onSettled: (_updated, _error, { order }) =>
       refreshHotel(queryClient, order.hotelId),
   })
 }
 
 /**
- * Whether a status change for this order is in flight, from any component.
- * The row menu, the details sheet and the confirm dialog each hold their
- * own mutation hook, so they ask the shared mutation cache instead.
+ * Whether a status change or a payment collection for this order is in
+ * flight, from any component. The row menu, the details sheet and the
+ * confirm dialog each hold their own mutation hooks, so they ask the
+ * shared mutation cache instead, and all disable together.
  */
 export function useIsOrderUpdating(orderId: string): boolean {
   return (
     useIsMutating({
-      mutationKey: updateStatusKey,
+      mutationKey: ["orders"],
       predicate: (mutation) =>
-        (mutation.state.variables as UpdateOrderStatusInput | undefined)?.order
-          .id === orderId,
+        (mutation.state.variables as { order?: Order } | undefined)?.order
+          ?.id === orderId,
     }) > 0
   )
 }
