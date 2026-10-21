@@ -247,7 +247,7 @@ function baseOrder(
   const status =
     overrides.status ??
     (progressed === "New" ? initialStatusFor(service, quantity) : progressed)
-  return {
+  const order: OrderSeed = {
     hotelId: profile.hotel.id,
     guestName: pick(rand, GUEST_NAMES),
     roomNumber: roomNumberFor(rand, profile),
@@ -262,6 +262,16 @@ function baseOrder(
     ...overrides,
     status,
   }
+  return settleComplimentary(order)
+}
+
+/**
+ * A complimentary ($0) order has nothing to pay, so it is always Paid.
+ * Applied after the random draws, not instead of them, so the rest of the
+ * seeded data stays exactly the same.
+ */
+function settleComplimentary<T extends OrderSeed>(order: T): T {
+  return order.amount === 0 ? { ...order, paymentStatus: "Paid" } : order
 }
 
 /** Hand-placed orders that guarantee every dashboard story is visible. */
@@ -285,7 +295,6 @@ function guaranteedOrders(
     order(SLA_TARGET_MINUTES.Housekeeping + 14, {
       service: "Housekeeping",
       status: "New",
-      paymentStatus: "Pending",
     }),
     // An oversized extra-bed request waiting on a manager decision.
     order(6, {
@@ -342,10 +351,10 @@ export function createIncomingOrder(
   const rand = mulberry32(now.getTime() % 2147483647)
   const seed = baseOrder(rand, profile, now, 0)
   const status = initialStatusFor(seed.service, seed.quantity)
-  return {
+  return settleComplimentary({
     id,
     ...seed,
     status,
     paymentStatus: chance(rand, 0.85) ? "Paid" : "Pending",
-  }
+  })
 }
