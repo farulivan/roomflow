@@ -10,7 +10,7 @@ import { makeOrder } from "@/test/factories"
 import { createTestQueryClient } from "@/test/render"
 
 import { ordersKeys } from "./queries"
-import { useUpdateOrderStatus } from "./mutations"
+import { useCollectPayment, useUpdateOrderStatus } from "./mutations"
 
 const realFetch = globalThis.fetch
 afterEach(() => {
@@ -137,5 +137,58 @@ describe("useUpdateOrderStatus", () => {
 
     expect(statusOf(first.id)).toBe("New")
     expect(result.current.error?.message).toBe("Server down.")
+  })
+})
+
+describe("useCollectPayment", () => {
+  function setupDeclined() {
+    const queryClient = createTestQueryClient()
+    const declined = makeOrder({ paymentStatus: "Failed", amount: 40 })
+    const listKey = ordersKeys.list(declined.hotelId, {})
+    queryClient.setQueryData<OrdersPage>(listKey, {
+      items: [declined],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    })
+    const { result } = renderHook(() => useCollectPayment(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      ),
+    })
+    const paymentOf = () =>
+      queryClient.getQueryData<OrdersPage>(listKey)?.items[0]?.paymentStatus
+    return { result, declined, paymentOf }
+  }
+
+  test("shows the payment as collected at once and keeps the server's answer", async () => {
+    const response = holdNextResponse()
+    const { result, declined, paymentOf } = setupDeclined()
+
+    act(() => {
+      result.current.mutate(declined)
+    })
+    await waitFor(() => expect(paymentOf()).toBe("Paid"))
+
+    response.succeed({ ...declined, paymentStatus: "Paid" })
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(paymentOf()).toBe("Paid")
+  })
+
+  test("puts the declined payment back when the server refuses", async () => {
+    const response = holdNextResponse()
+    const { result, declined, paymentOf } = setupDeclined()
+
+    act(() => {
+      result.current.mutate(declined)
+    })
+    await waitFor(() => expect(paymentOf()).toBe("Paid"))
+
+    response.fail()
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    expect(paymentOf()).toBe("Failed")
   })
 })

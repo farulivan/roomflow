@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import type { Order } from "@/domain/order"
 import {
-  actionsForStatus,
+  actionsForOrder,
   isFinalStatus,
   type OrderAction,
 } from "@/domain/order-status"
@@ -32,17 +32,17 @@ const INTENT_BUTTON_CLASSES: Record<OrderAction["intent"], string> = {
 }
 
 /**
- * Renders exactly the transitions `actionsForStatus` allows for this order's
- * current status — no per-status branching here, so this component and the
- * mock API can never disagree about what's legal. Actions that need a
- * confirmation hand off to the page's shared confirm dialog.
+ * Renders exactly the actions `actionsForOrder` allows for this order, with
+ * no per-status branching here, so this component and the mock API can
+ * never disagree about what's legal. Actions that need a confirmation hand
+ * off to the page's shared confirm dialog.
  */
 export function OrderActions({ order, variant }: OrderActionsProps) {
   const mutation = useUpdateOrderStatus()
   const requestConfirmation = useConfirmAction()
   const isPending = useIsOrderUpdating(order.id)
 
-  const actions = actionsForStatus(order.status)
+  const actions = actionsForOrder(order)
 
   const runAction = (action: OrderAction) => {
     if (action.confirm) {

@@ -19,8 +19,8 @@ interface PendingConfirmation {
 }
 
 /**
- * Owns the one confirmation dialog for destructive actions on the orders
- * page. It lives here, above the list, rather than inside each row: a row
+ * Owns the one confirmation dialog for actions that ask first on the
+ * orders page. It lives here, above the list, rather than inside each row: a row
  * can unmount at any time (a poll or a new order pushes it to page 2), and
  * a dialog inside it would vanish with a half-typed reason. The dialog
  * keeps its own copy of the order for the same reason.

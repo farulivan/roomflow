@@ -57,4 +57,23 @@ describe("OrderActions", () => {
       })
     ).toBeInTheDocument()
   })
+
+  test("an order with a declined payment asks before acknowledging", async () => {
+    const user = userEvent.setup()
+    const order = makeOrder({
+      status: "New",
+      paymentStatus: "Failed",
+      amount: 40,
+    })
+    renderActions(<OrderActions order={order} variant="detail" />)
+
+    await user.click(await screen.findByRole("button", { name: "Acknowledge" }))
+
+    const dialog = await screen.findByRole("alertdialog", {
+      name: new RegExp(`Acknowledge order ${order.id}`),
+    })
+    expect(dialog).toHaveTextContent("payment was declined")
+    // A go-ahead needs no reason; only cancelling and rejecting ask for one.
+    expect(screen.queryByLabelText("Reason (optional)")).not.toBeInTheDocument()
+  })
 })
