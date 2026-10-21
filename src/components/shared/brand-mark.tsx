@@ -40,7 +40,7 @@ export function BrandMark({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
       <LogoMark />
-      <span className="text-lg font-bold tracking-tight">Roomflow</span>
+      <span className="text-lg font-semibold tracking-tight">Roomflow</span>
     </div>
   )
 }

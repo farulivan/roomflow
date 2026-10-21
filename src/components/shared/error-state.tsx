@@ -23,11 +23,11 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <Empty className="border border-destructive/30">
+    <Empty className="bg-card py-12 ring-1 ring-foreground/10">
       <EmptyHeader>
         <EmptyMedia
           variant="icon"
-          className="bg-destructive/10 text-destructive"
+          className="size-10 rounded-full bg-destructive/10 text-destructive"
         >
           <CircleAlert aria-hidden />
         </EmptyMedia>
