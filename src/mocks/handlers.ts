@@ -4,6 +4,7 @@ import { computeMetrics } from "@/domain/metrics"
 import { isOrderStatus } from "@/domain/order"
 import { applyOrderQuery, parseOrderQuery } from "@/domain/order-query"
 import { canTransition } from "@/domain/order-status"
+import { needsPaymentFollowUp } from "@/domain/payment"
 import { getDemoSettings } from "@/lib/demo-settings"
 
 import { db } from "./db"
@@ -87,6 +88,35 @@ export const handlers = [
       }
 
       return HttpResponse.json(db.updateStatus(hotelId, orderId, body.status))
+    }
+  ),
+
+  http.patch(
+    "/api/hotels/:hotelId/orders/:orderId/payment",
+    async ({ request, params }) => {
+      const hotelId = String(params.hotelId)
+      const orderId = String(params.orderId)
+      const order = db.find(hotelId, orderId)
+      if (!order) return orderNotFound(orderId)
+
+      // Staff can only record that a payment was collected; refunds and
+      // charges belong to a payment system, not to this console.
+      const body = (await request.json()) as { status?: unknown }
+      if (body.status !== "Paid") {
+        return HttpResponse.json(
+          { message: "Only collecting a payment is supported." },
+          { status: 400 }
+        )
+      }
+
+      if (!needsPaymentFollowUp(order)) {
+        return HttpResponse.json(
+          { message: `Order ${orderId} has no payment to collect.` },
+          { status: 422 }
+        )
+      }
+
+      return HttpResponse.json(db.updatePayment(hotelId, orderId, "Paid"))
     }
   ),
 

@@ -30,6 +30,7 @@ describe("tenant scoping", () => {
     expect(db.find(cedarfall.id, order.id)).toBeUndefined()
     expect(db.updateStatus(cedarfall.id, order.id, "Cancelled")).toBe(undefined)
     expect(order.status).not.toBe("Cancelled")
+    expect(db.updatePayment(cedarfall.id, order.id, "Paid")).toBeUndefined()
   })
 
   test("order IDs are unique across the whole table", () => {
