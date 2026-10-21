@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -64,18 +65,18 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="items-center text-center">
-          <BrandMark className="justify-center" />
-          <CardTitle className="mt-2 text-section">Sign in</CardTitle>
-          <CardDescription>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-8 px-4 py-10">
+      <Card className="w-full max-w-[22rem] [--card-spacing:--spacing(6)]">
+        <CardHeader className="justify-items-center gap-1.5 text-center">
+          <BrandMark className="mb-4" />
+          <CardTitle className="text-section">Sign in</CardTitle>
+          <CardDescription className="text-balance">
             Guest requests for every hotel you work in, in one place.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form
-            className="space-y-4"
+            className="space-y-5"
             noValidate
             onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
           >
@@ -87,6 +88,7 @@ export function LoginPage() {
                   type="email"
                   autoComplete="username"
                   aria-invalid={!!form.formState.errors.email}
+                  className="h-10"
                   {...form.register("email")}
                 />
                 <FieldError errors={[form.formState.errors.email]} />
@@ -101,31 +103,36 @@ export function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   aria-invalid={!!form.formState.errors.password}
+                  className="h-10"
                   {...form.register("password")}
                 />
                 <FieldError errors={[form.formState.errors.password]} />
               </FieldContent>
             </Field>
 
-            <div className="rounded-md bg-muted/50 p-2.5 text-xs text-muted-foreground">
-              Demo account: any password of 6+ characters works.{" "}
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                className="h-auto p-0 text-xs"
-                onClick={fillDemoAccount}
-              >
-                Use demo account
-              </Button>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="mt-1 h-10 w-full text-body"
+              disabled={isLoading}
+            >
               {isLoading && <Loader2 className="animate-spin" />}
               {isLoading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
         </CardContent>
+        <CardFooter className="flex-col gap-0.5 text-center text-sm text-muted-foreground">
+          <p className="text-balance">
+            Demo account: any password of 6+ characters works.
+          </p>
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 text-sm"
+            onClick={fillDemoAccount}
+          >
+            Use demo account
+          </Button>
+        </CardFooter>
       </Card>
       <Credit />
     </div>
