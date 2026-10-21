@@ -21,6 +21,7 @@ A guest-service dashboard for hotel staff. Room service, housekeeping, laundry, 
   - Cancel and Reject ask first, wait for the server, and keep your note if something fails.
 - **Per-service SLA targets.** A New room-service order is late after 10 minutes, a laundry pickup after 30. Late orders are flagged in the list, the drawer and the dashboard.
 - **Approval flow:** an extra-bed request beyond the room's capacity waits for a manager to approve or reject it.
+- **Payment follow-up:** taking on an order whose card was declined asks once, and "Mark payment collected", in the row menu or the order drawer, clears it from "Needs attention". Service is never blocked.
 - **Live incoming orders** arrive as a toast with a View button. They never take focus away from what you're doing.
 - **Loading, empty and error states with retry on every data view.** A failed background refresh keeps your data on screen and tells you how old it is.
 - **Demo controls** in the header: automatic new orders, slow network, failing API, send an order now, reset the data.
@@ -118,6 +119,8 @@ The query hooks, components and domain stay as they are.
 
 **A failed status change.** Quick steps like Acknowledge or Start are optimistic, because they're easy to retry and staff do them all day. If the server refuses, only that order goes back, so another order you changed in the meantime keeps its change, and a toast says what was reverted. Cancel and Reject can't be undone, so they don't pretend: the dialog waits for the server, shows the error inside itself if one comes, and keeps the reason you typed.
 
+**A declined payment.** In a hotel, serving an order and getting paid for it are separate jobs, often done by different people at different moments. The billing check happens when the order is taken, a guest who can't charge to the room pays at delivery, and a declined card is the front office's to sort out. So a declined payment never blocks service: a guest waiting on a cold tray to protect a $40 charge is the worse outcome. Instead, acknowledging or approving the order asks once, so nobody takes it on without knowing, and "Mark payment collected" gives the follow-up an end, whenever the money comes in: before the order is taken on, at delivery, or after it's completed. It sits in the same row menu as every other action, and in the order drawer. Until then the order stays in "Needs attention". A complimentary order never has a payment to chase.
+
 **A new order arriving mid-action.** It appears as a toast that doesn't take focus, with a View button, and the list refreshes in the background. Whatever you're in the middle of survives the refresh:
 
 - The cancel dialog sits above the list with its own copy of the order, so a row moving to page 2 doesn't close it.
@@ -160,4 +163,4 @@ I build with [Claude Code](https://claude.com/claude-code) as an assistant. I se
 
 - Cancel and reject reasons are sent to the API but not stored or shown anywhere.
 - All amounts are in USD. There's no per-hotel currency.
-- There are no roles: every signed-in user can approve extra beds.
+- There are no roles: every signed-in user can approve extra beds and mark payments collected.

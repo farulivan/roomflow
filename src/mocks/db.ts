@@ -1,5 +1,5 @@
 import type { Hotel } from "@/domain/hotel"
-import type { Order, OrderStatus } from "@/domain/order"
+import type { Order, OrderStatus, PaymentStatus } from "@/domain/order"
 
 import { HOTEL_PROFILES, type HotelProfile } from "./hotels"
 import { createSeedOrders } from "./seed"
@@ -42,6 +42,17 @@ export const db = {
     const order = db.find(hotelId, id)
     if (!order) return undefined
     order.status = status
+    return order
+  },
+
+  updatePayment(
+    hotelId: string,
+    id: string,
+    paymentStatus: PaymentStatus
+  ): Order | undefined {
+    const order = db.find(hotelId, id)
+    if (!order) return undefined
+    order.paymentStatus = paymentStatus
     return order
   },
 

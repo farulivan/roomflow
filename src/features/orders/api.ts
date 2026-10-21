@@ -20,6 +20,17 @@ export const ordersApi = {
     return request<Order>(`${ordersPath(hotelId)}/${encodeURIComponent(id)}`)
   },
 
+  /** Records that the front desk collected a declined payment. */
+  collectPayment(hotelId: string, id: string): Promise<Order> {
+    return request<Order>(
+      `${ordersPath(hotelId)}/${encodeURIComponent(id)}/payment`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status: "Paid" }),
+      }
+    )
+  },
+
   updateStatus(
     hotelId: string,
     id: string,

@@ -1,5 +1,6 @@
 import type { Order, ServiceType } from "./order"
 import { isFinalStatus } from "./order-status"
+import { needsPaymentFollowUp } from "./payment"
 import { isSlaOverdue } from "./sla"
 
 export interface ServiceStat {
@@ -94,11 +95,7 @@ export function computeMetrics(orders: readonly Order[], now: Date): Metrics {
   const pendingApproval = orders.filter(
     (order) => order.status === "Pending Approval"
   )
-  // A completed order whose payment failed still owes money, so it stays
-  // on the list; only a cancelled order no longer needs following up.
-  const failedPayments = orders.filter(
-    (order) => order.paymentStatus === "Failed" && order.status !== "Cancelled"
-  )
+  const failedPayments = orders.filter(needsPaymentFollowUp)
 
   const attention: AttentionItem[] = []
   const seen = new Set<string>()

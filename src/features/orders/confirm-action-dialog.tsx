@@ -30,8 +30,9 @@ interface ConfirmActionDialogProps {
 }
 
 /**
- * Confirmation step shared by every destructive lifecycle action (Cancel,
- * Reject). Controlled by ConfirmActionProvider — this component only asks
+ * Confirmation step shared by every lifecycle action that asks first: the
+ * destructive ones (Cancel, Reject), and taking on an order whose payment
+ * was declined. Controlled by ConfirmActionProvider — this component only asks
  * the question and reports back what the user decided; it never touches
  * the mutation itself.
  */
@@ -56,6 +57,7 @@ export function ConfirmActionDialog({
   }
 
   const isReject = action.label === "Reject"
+  const isPaymentCheck = action.confirmReason === "payment-declined"
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -65,22 +67,26 @@ export function ConfirmActionDialog({
             {action.label} order <span className="font-mono">{order.id}</span>?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {isReject
-              ? "The request will be declined and the guest's booking stays unchanged."
-              : "The guest's request will be closed and cannot be reopened."}
+            {isPaymentCheck
+              ? "The guest's payment was declined. Collect it at delivery, or the front desk will before checkout."
+              : isReject
+                ? "The request will be declined and the guest's booking stays unchanged."
+                : "The guest's request will be closed and cannot be reopened."}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="grid gap-1.5">
-          <Label htmlFor="action-reason">Reason (optional)</Label>
-          <Textarea
-            id="action-reason"
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            placeholder="Add a short note for the log…"
-            disabled={isPending}
-          />
-        </div>
+        {!isPaymentCheck && (
+          <div className="grid gap-1.5">
+            <Label htmlFor="action-reason">Reason (optional)</Label>
+            <Textarea
+              id="action-reason"
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              placeholder="Add a short note for the log…"
+              disabled={isPending}
+            />
+          </div>
+        )}
 
         {error && !isPending && (
           <Alert variant="destructive">
@@ -99,7 +105,7 @@ export function ConfirmActionDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>Go back</AlertDialogCancel>
           <AlertDialogAction
-            variant="destructive"
+            variant={isPaymentCheck ? "default" : "destructive"}
             disabled={isPending}
             onClick={(event) => {
               // AlertDialogAction closes on click by default; hold it open

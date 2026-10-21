@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react"
-import { AlarmClock, SearchX, TriangleAlert } from "lucide-react"
+import { AlarmClock, Loader2, SearchX, TriangleAlert } from "lucide-react"
 import { useLocation, useNavigate, useParams } from "react-router"
 
 import { ErrorState } from "@/components/shared/error-state"
@@ -8,6 +8,7 @@ import { RoomTag } from "@/components/shared/room-tag"
 import { SlaBadge } from "@/components/shared/sla-badge"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -17,6 +18,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Order } from "@/domain/order"
+import { needsPaymentFollowUp } from "@/domain/payment"
 import {
   isSlaOverdue,
   minutesOverdue,
@@ -34,6 +37,7 @@ import {
 import { paths } from "@/lib/paths"
 import { useNow } from "@/lib/use-now"
 
+import { useCollectPayment, useIsOrderUpdating } from "./mutations"
 import { OrderActions } from "./order-actions"
 import { useOrder } from "./queries"
 
@@ -48,6 +52,43 @@ function DetailRow({ label, children }: DetailRowProps) {
       <dt className="text-muted-foreground">{label}</dt>
       <dd>{children}</dd>
     </div>
+  )
+}
+
+/**
+ * A declined payment that still has to be collected, and the button the
+ * front desk uses once it has been. Collecting it also takes the order off
+ * the dashboard's "Needs attention" list.
+ */
+function PaymentFollowUp({ order }: { order: Order }) {
+  const collectPayment = useCollectPayment()
+  // Shared with the row menu and the footer actions, so a change started
+  // anywhere disables this button too.
+  const isPending = useIsOrderUpdating(order.id)
+
+  return (
+    <Alert variant="destructive" className="mb-3 border-destructive/30">
+      <TriangleAlert />
+      <AlertTitle>Payment failed</AlertTitle>
+      <AlertDescription>
+        <p>
+          {order.status === "Completed"
+            ? "Delivered, but the payment still needs collecting."
+            : "The card was declined. Collect it at delivery, or the front desk will before checkout."}
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="mt-2"
+          disabled={isPending}
+          onClick={() => collectPayment.mutate({ order })}
+        >
+          {isPending && <Loader2 className="animate-spin" />}
+          Mark payment collected
+        </Button>
+      </AlertDescription>
+    </Alert>
   )
 }
 
@@ -158,22 +199,9 @@ export function OrderDetailsSheet() {
             </Alert>
           )}
 
-          {query.data &&
-            query.data.paymentStatus === "Failed" &&
-            query.data.status !== "Cancelled" && (
-              <Alert
-                variant="destructive"
-                className="mb-3 border-destructive/30"
-              >
-                <TriangleAlert />
-                <AlertTitle>Payment failed</AlertTitle>
-                <AlertDescription>
-                  {query.data.status === "Completed"
-                    ? "Delivered, but the payment still needs collecting."
-                    : "Follow up on payment before fulfilling this order."}
-                </AlertDescription>
-              </Alert>
-            )}
+          {query.data && needsPaymentFollowUp(query.data) && (
+            <PaymentFollowUp order={query.data} />
+          )}
 
           {query.data && (
             <dl className="divide-y">

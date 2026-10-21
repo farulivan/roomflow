@@ -22,7 +22,22 @@ interface UpdateOrderStatusInput {
   reason?: string
 }
 
+// Both start with "orders", so useIsOrderUpdating can watch them together.
 const updateStatusKey = ["orders", "update-status"] as const
+const collectPaymentKey = ["orders", "collect-payment"] as const
+
+/** The toast line for a change that failed and was put back. */
+function revertedDescription(error: Error): string {
+  return error instanceof ApiError
+    ? `${error.message} The change was reverted.`
+    : "The change was reverted. Check your connection and try again."
+}
+
+/** Reloads everything that shows this hotel's orders. */
+function refreshHotel(queryClient: QueryClient, hotelId: string): void {
+  void queryClient.invalidateQueries({ queryKey: ordersKeys.all(hotelId) })
+  void queryClient.invalidateQueries({ queryKey: metricsKeys.all(hotelId) })
+}
 
 /** Writes one order into every cached list page and its detail entry. */
 function writeOrder(queryClient: QueryClient, next: Order): void {
@@ -75,10 +90,7 @@ export function useUpdateOrderStatus() {
 
       writeOrder(queryClient, order)
       toast.error(`Couldn't ${action.label.toLowerCase()} ${order.id}`, {
-        description:
-          error instanceof ApiError
-            ? `${error.message} The change was reverted.`
-            : "The change was reverted. Check your connection and try again.",
+        description: revertedDescription(error),
       })
     },
 
@@ -93,29 +105,63 @@ export function useUpdateOrderStatus() {
       })
     },
 
-    onSettled: (_updated, _error, { order }) => {
-      void queryClient.invalidateQueries({
-        queryKey: ordersKeys.all(order.hotelId),
-      })
-      void queryClient.invalidateQueries({
-        queryKey: metricsKeys.all(order.hotelId),
-      })
-    },
+    onSettled: (_updated, _error, { order }) =>
+      refreshHotel(queryClient, order.hotelId),
   })
 }
 
 /**
- * Whether a status change for this order is in flight, from any component.
- * The row menu, the details sheet and the confirm dialog each hold their
- * own mutation hook, so they ask the shared mutation cache instead.
+ * Records that a declined payment was collected. Optimistic, like the
+ * quick lifecycle steps: it's easy to retry, and on failure only this
+ * order is put back.
+ */
+export function useCollectPayment() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: collectPaymentKey,
+    mutationFn: ({ order }: { order: Order }) =>
+      ordersApi.collectPayment(order.hotelId, order.id),
+
+    onMutate: async ({ order }) => {
+      await queryClient.cancelQueries({
+        queryKey: ordersKeys.all(order.hotelId),
+      })
+      writeOrder(queryClient, { ...order, paymentStatus: "Paid" })
+    },
+
+    onError: (error, { order }) => {
+      writeOrder(queryClient, order)
+      toast.error(`Couldn't record the payment for ${order.id}`, {
+        description: revertedDescription(error),
+      })
+      track("payment_collected", { orderId: order.id, outcome: "error" })
+    },
+
+    onSuccess: (updated) => {
+      writeOrder(queryClient, updated)
+      toast.success(`Payment for ${updated.id} collected`)
+      track("payment_collected", { orderId: updated.id, outcome: "success" })
+    },
+
+    onSettled: (_updated, _error, { order }) =>
+      refreshHotel(queryClient, order.hotelId),
+  })
+}
+
+/**
+ * Whether a status change or a payment collection for this order is in
+ * flight, from any component. The row menu, the details sheet and the
+ * confirm dialog each hold their own mutation hooks, so they ask the
+ * shared mutation cache instead, and all disable together.
  */
 export function useIsOrderUpdating(orderId: string): boolean {
   return (
     useIsMutating({
-      mutationKey: updateStatusKey,
+      mutationKey: ["orders"],
       predicate: (mutation) =>
-        (mutation.state.variables as UpdateOrderStatusInput | undefined)?.order
-          .id === orderId,
+        (mutation.state.variables as { order?: Order } | undefined)?.order
+          ?.id === orderId,
     }) > 0
   )
 }

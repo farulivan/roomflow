@@ -5,18 +5,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { Order } from "@/domain/order"
-import {
-  actionsForStatus,
-  isFinalStatus,
-  type OrderAction,
-} from "@/domain/order-status"
+import { actionsForOrder, type OrderAction } from "@/domain/order-status"
+import { needsPaymentFollowUp } from "@/domain/payment"
 import { cn } from "@/lib/utils"
 
 import { useConfirmAction } from "./confirm-action"
-import { useIsOrderUpdating, useUpdateOrderStatus } from "./mutations"
+import {
+  useCollectPayment,
+  useIsOrderUpdating,
+  useUpdateOrderStatus,
+} from "./mutations"
 
 interface OrderActionsProps {
   order: Order
@@ -32,17 +35,23 @@ const INTENT_BUTTON_CLASSES: Record<OrderAction["intent"], string> = {
 }
 
 /**
- * Renders exactly the transitions `actionsForStatus` allows for this order's
- * current status — no per-status branching here, so this component and the
- * mock API can never disagree about what's legal. Actions that need a
- * confirmation hand off to the page's shared confirm dialog.
+ * Renders exactly the actions `actionsForOrder` allows for this order, with
+ * no per-status branching here, so this component and the mock API can
+ * never disagree about what's legal. Actions that need a confirmation hand
+ * off to the page's shared confirm dialog.
+ *
+ * The row menu also carries the payment track: an order whose payment is
+ * still owed offers "Mark payment collected", even once it's completed,
+ * since a delivered-but-unpaid order is exactly when that's needed.
  */
 export function OrderActions({ order, variant }: OrderActionsProps) {
   const mutation = useUpdateOrderStatus()
+  const collectPayment = useCollectPayment()
   const requestConfirmation = useConfirmAction()
   const isPending = useIsOrderUpdating(order.id)
 
-  const actions = actionsForStatus(order.status)
+  const actions = actionsForOrder(order)
+  const paymentOwed = needsPaymentFollowUp(order)
 
   const runAction = (action: OrderAction) => {
     if (action.confirm) {
@@ -53,7 +62,7 @@ export function OrderActions({ order, variant }: OrderActionsProps) {
   }
 
   if (variant === "row") {
-    if (isFinalStatus(order.status)) return null
+    if (actions.length === 0 && !paymentOwed) return null
 
     return (
       <DropdownMenu>
@@ -75,6 +84,8 @@ export function OrderActions({ order, variant }: OrderActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
+          // Wide enough for "Mark payment collected" on one line.
+          className="min-w-48"
           onClick={(event) => event.stopPropagation()}
         >
           {actions.map((action) => (
@@ -89,6 +100,20 @@ export function OrderActions({ order, variant }: OrderActionsProps) {
               {action.label}
             </DropdownMenuItem>
           ))}
+          {paymentOwed && (
+            <>
+              {actions.length > 0 && <DropdownMenuSeparator />}
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Payment
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                disabled={isPending}
+                onSelect={() => collectPayment.mutate({ order })}
+              >
+                Mark payment collected
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     )

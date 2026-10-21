@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test"
 
+import { makeOrder } from "@/test/factories"
 import { EXTRA_BED_CAPACITY, ORDER_STATUSES, type OrderStatus } from "./order"
 import {
+  actionsForOrder,
   actionsForStatus,
   canTransition,
   initialStatusFor,
@@ -103,5 +105,40 @@ describe("initialStatusFor", () => {
     expect(initialStatusFor("Extra Bed", EXTRA_BED_CAPACITY + 1)).toBe(
       "Pending Approval"
     )
+  })
+})
+
+describe("actionsForOrder", () => {
+  const declined = { paymentStatus: "Failed", amount: 40 } as const
+
+  test("matches actionsForStatus when the payment is fine", () => {
+    const order = makeOrder({ status: "New" })
+    expect(actionsForOrder(order)).toEqual(actionsForStatus("New"))
+  })
+
+  test("acknowledging an order with a declined payment asks first", () => {
+    const [acknowledge, cancel] = actionsForOrder(
+      makeOrder({ status: "New", ...declined })
+    )
+    expect(acknowledge).toMatchObject({
+      label: "Acknowledge",
+      confirm: true,
+      confirmReason: "payment-declined",
+    })
+    expect(cancel).toEqual(actionsForStatus("New")[1])
+  })
+
+  test("so does approving one", () => {
+    const [approve] = actionsForOrder(
+      makeOrder({ status: "Pending Approval", ...declined })
+    )
+    expect(approve).toMatchObject({ label: "Approve", confirm: true })
+  })
+
+  test("later steps stay one click", () => {
+    const [complete] = actionsForOrder(
+      makeOrder({ status: "In Progress", ...declined })
+    )
+    expect(complete).toMatchObject({ label: "Complete", confirm: false })
   })
 })

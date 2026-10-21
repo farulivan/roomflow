@@ -30,6 +30,7 @@ describe("tenant scoping", () => {
     expect(db.find(cedarfall.id, order.id)).toBeUndefined()
     expect(db.updateStatus(cedarfall.id, order.id, "Cancelled")).toBe(undefined)
     expect(order.status).not.toBe("Cancelled")
+    expect(db.updatePayment(cedarfall.id, order.id, "Paid")).toBeUndefined()
   })
 
   test("order IDs are unique across the whole table", () => {
@@ -55,6 +56,14 @@ describe("nextOrderId", () => {
 })
 
 describe("seed", () => {
+  test("complimentary orders never carry a payment problem", () => {
+    for (const hotel of db.hotels()) {
+      const free = db.list(hotel.id).filter((order) => order.amount === 0)
+      expect(free.length).toBeGreaterThan(0)
+      expect(free.every((order) => order.paymentStatus === "Paid")).toBe(true)
+    }
+  })
+
   test("every hotel opens with each dashboard story visible", () => {
     for (const hotel of db.hotels()) {
       const metrics = computeMetrics(db.list(hotel.id), new Date())
