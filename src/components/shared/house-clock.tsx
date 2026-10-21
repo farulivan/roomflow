@@ -26,10 +26,10 @@ export function HouseClock() {
   return (
     <div
       aria-hidden
-      className="mr-2 hidden items-baseline gap-1.5 text-sm tabular-nums sm:flex"
+      className="mr-3 hidden items-baseline gap-1.5 text-base tabular-nums sm:flex"
     >
       <span className="text-muted-foreground">{weekday.format(now)}</span>
-      <span>{formatClockTime(now)}</span>
+      <span className="font-medium">{formatClockTime(now)}</span>
     </div>
   )
 }
