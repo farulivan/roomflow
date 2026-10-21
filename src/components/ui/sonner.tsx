@@ -33,6 +33,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          // An open sheet or dialog turns pointer events off on <body>, and
+          // the toasts would inherit that. The list itself has no height,
+          // so this only makes the toasts clickable.
+          pointerEvents: "auto",
         } as React.CSSProperties
       }
       toastOptions={{
