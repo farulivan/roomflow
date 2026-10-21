@@ -8,3 +8,9 @@ yarn.lock
 dist/
 bun.lock
 public/mockServiceWorker.js
+
+# Hidden folders hold local editor and tool state; only these two belong
+# to the project.
+/.*/
+!/.github/
+!/.vscode/
