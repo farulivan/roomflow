@@ -9,6 +9,11 @@ export const appConfig = {
   clockTickMs: 30_000,
   /** Cadence of simulated incoming orders when auto mode is on. */
   simulatorIntervalMs: 45_000,
+  /** Where the credit in the sidebar and on the sign-in page points. */
+  links: {
+    author: "https://github.com/farulivan",
+    source: "https://github.com/farulivan/roomflow",
+  },
   storageKeys: {
     session: "roomflow.session",
     theme: "roomflow.theme",
