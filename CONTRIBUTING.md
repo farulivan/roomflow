@@ -2,9 +2,11 @@
 
 ## Branches and pull requests
 
-Work on a branch off `main`, named `feat/<short-name>` or `fix/<short-name>`, and open a pull request. Pull requests are squash-merged, so `main` gets one commit per pull request.
+Work on a branch off `main` named after the kind of change: `feat/`, `fix/`, `docs/`, `ci/` or `chore/`, followed by a short name. Open a pull request and fill in the template's sections.
 
-The pull request title follows the commit format below and is at most **44 characters**: GitHub appends ` (#123)` when squashing, and the result has to stay within 50. Fill in the template's sections.
+Pull requests land as **merge commits**, so every commit on the branch stays in `main`'s history. Before asking for review, make sure each commit is clean and follows the format below: no "wip" or "fix typo" commits.
+
+The pull request title follows the same commit format and is at most **44 characters**. It becomes the merge commit's subject with ` (#123)` appended, and the result has to stay within 50.
 
 ## Commit messages
 
