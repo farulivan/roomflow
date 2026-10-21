@@ -74,7 +74,7 @@ function PaymentFollowUp({ order }: { order: Order }) {
         <p>
           {order.status === "Completed"
             ? "Delivered, but the payment still needs collecting."
-            : "The card was declined. Staff can go ahead; the front desk collects it before checkout."}
+            : "The card was declined. Collect it at delivery, or the front desk will before checkout."}
         </p>
         <Button
           type="button"

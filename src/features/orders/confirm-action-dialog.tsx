@@ -68,7 +68,7 @@ export function ConfirmActionDialog({
           </AlertDialogTitle>
           <AlertDialogDescription>
             {isPaymentCheck
-              ? "The guest's payment was declined. You can go ahead; the front desk collects it before checkout."
+              ? "The guest's payment was declined. Collect it at delivery, or the front desk will before checkout."
               : isReject
                 ? "The request will be declined and the guest's booking stays unchanged."
                 : "The guest's request will be closed and cannot be reopened."}
