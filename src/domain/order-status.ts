@@ -1,4 +1,10 @@
-import { EXTRA_BED_CAPACITY, type OrderStatus, type ServiceType } from "./order"
+import {
+  EXTRA_BED_CAPACITY,
+  type Order,
+  type OrderStatus,
+  type ServiceType,
+} from "./order"
+import { needsPaymentFollowUp } from "./payment"
 
 /**
  * The order lifecycle as a transition map — the single source of truth for
@@ -47,8 +53,13 @@ export interface OrderAction {
   /** Past-tense verb for confirmation feedback, e.g. "Order acknowledged". */
   doneLabel: string
   intent: "default" | "success" | "destructive"
-  /** Destructive actions ask for confirmation before running. */
+  /**
+   * Asks for confirmation before running: always for destructive actions,
+   * and for some steps depending on the order (see actionsForOrder).
+   */
   confirm: boolean
+  /** Why a non-destructive step asks first, so the question can say so. */
+  confirmReason?: "payment-declined"
 }
 
 /** The same Cancel step offered from New, Acknowledged and In Progress. */
@@ -114,4 +125,22 @@ const ACTIONS_BY_STATUS: Record<OrderStatus, readonly OrderAction[]> = {
 /** Actions staff may take on an order in the given status. */
 export function actionsForStatus(status: OrderStatus): readonly OrderAction[] {
   return ACTIONS_BY_STATUS[status]
+}
+
+/**
+ * The actions for this particular order: those for its status, except that
+ * taking on an order whose payment was declined (Acknowledge, or Approve)
+ * asks first. Staff can always go ahead; they just do it knowing the front
+ * desk still has to collect.
+ */
+export function actionsForOrder(
+  order: Pick<Order, "status" | "paymentStatus" | "amount">
+): readonly OrderAction[] {
+  const actions = actionsForStatus(order.status)
+  if (!needsPaymentFollowUp(order)) return actions
+  return actions.map((action) =>
+    action.to === "Acknowledged"
+      ? { ...action, confirm: true, confirmReason: "payment-declined" }
+      : action
+  )
 }
