@@ -29,9 +29,9 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <Empty className="border">
+    <Empty className="bg-card py-12 ring-1 ring-foreground/10">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
+        <EmptyMedia variant="icon" className="size-10 rounded-full">
           <Icon aria-hidden />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>

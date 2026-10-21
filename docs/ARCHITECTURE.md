@@ -14,7 +14,7 @@ How Roomflow is put together, and why. The [README](../README.md) covers what th
 | React Router v8 (data router)          | Hotel-scoped routes, URL-driven list state, a routed details drawer                                                       |
 | react-hook-form + Zod 4                | Schema-first forms; Zod also validates the session and demo settings read back from `localStorage`                        |
 | MSW v2 (browser)                       | The backend: intercepts real `fetch` calls at the network boundary, in dev and in the deployed build                      |
-| Recharts (via shadcn charts)           | The two dashboard charts; lazy-loaded with the dashboard route                                                            |
+| Recharts (via shadcn charts)           | The orders-by-hour chart; lazy-loaded with the dashboard route                                                            |
 | bun test + Testing Library + happy-dom | Unit tests for the domain and mock database, component and hook tests for the UI                                          |
 | Cloudflare Workers (static assets)     | Hosting: the built files served from the edge, with the custom domain on the same account                                 |
 
@@ -58,11 +58,11 @@ src/
   app/          # router, providers, app shell, route guards, hotel scope, status screens
   components/
     ui/         # shadcn/ui primitives (CLI-generated, then themed)
-    shared/     # badges, RoomTag, BrandMark, empty/error/stale-data states, page header
+    shared/     # badges, RoomTag, Amount, BrandMark, empty/error/stale-data states, page header
   domain/       # business rules and shared types, fully unit-tested
   features/
     auth/       # login page, session context, login schema
-    dashboard/  # KPI cards, charts, needs-attention list (lazy-loaded route)
+    dashboard/  # today summary, orders chart, needs-attention list, top services (lazy-loaded route)
     hotels/     # hotel list query, current-hotel context, hotel switcher
     orders/     # list page, toolbar, table and cards, details sheet, actions, confirm dialog
     simulator/  # demo controls and the incoming-order simulation
@@ -261,6 +261,7 @@ The app is a static build, served by Cloudflare Workers with no Worker script (`
 - **Caching:** `public/_headers` marks the fingerprinted files in `/assets` as immutable for a year. `index.html` and the service worker always revalidate, so a new deploy shows up on the next load.
 - **Addresses:** the custom domain is the only public address. Each uploaded version also gets its own `workers.dev` preview URL for checking a change before it goes live.
 - **Releases:** Cloudflare builds and deploys every push to `main`. `bun run deploy` does the same by hand from a local `dist/`.
+- **Branch previews:** every push to any other branch runs `wrangler preview`, which gives the branch its own Preview URL and posts it on the pull request. It needs the `previews` block in `wrangler.jsonc`, empty because a preview uses the same settings as production.
 
 ## Performance and scale
 

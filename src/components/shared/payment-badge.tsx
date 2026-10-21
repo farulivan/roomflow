@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/badge"
 import type { PaymentStatus } from "@/domain/order"
 import { cn } from "@/lib/utils"
 
-const paymentBadgeVariants = cva("gap-1.5 border font-medium", {
+const paymentBadgeVariants = cva("gap-1.5 border", {
   variants: {
     status: {
-      Paid: "border-status-done/25 bg-status-done/8 text-status-done",
-      Pending: "border-brass/45 bg-brass/12 text-brass-ink",
+      Paid: "border-status-done/30 bg-status-done/8 text-status-done",
+      Pending: "border-brass/40 bg-brass/10 text-brass-ink",
       // Solid, not subtle: a failed payment is a problem to act on, not
       // just informational.
       Failed:

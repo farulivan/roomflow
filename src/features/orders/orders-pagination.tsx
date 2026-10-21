@@ -25,12 +25,9 @@ export function OrdersPagination({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
       <p className="text-muted-foreground">
-        Showing{" "}
-        <span className="font-mono text-foreground tabular-nums">{start}</span>{" "}
-        to <span className="font-mono text-foreground tabular-nums">{end}</span>{" "}
-        of{" "}
-        <span className="font-mono text-foreground tabular-nums">{total}</span>{" "}
-        orders
+        Showing <span className="text-foreground tabular-nums">{start}</span> to{" "}
+        <span className="text-foreground tabular-nums">{end}</span> of{" "}
+        <span className="text-foreground tabular-nums">{total}</span> orders
       </p>
       <div className="flex items-center gap-2">
         <Button

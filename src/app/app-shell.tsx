@@ -36,6 +36,17 @@ const NAV_ITEMS = [
   { to: paths.orders, label: "Orders", icon: ClipboardList, end: false },
 ] as const
 
+/** The signed-in person's initial, in the brand color. */
+function UserAvatar({ email }: { email: string }) {
+  return (
+    <Avatar>
+      <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+        {email.charAt(0).toUpperCase()}
+      </AvatarFallback>
+    </Avatar>
+  )
+}
+
 function UserMenu() {
   const { session, logout } = useAuth()
   const navigate = useNavigate()
@@ -48,17 +59,21 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Account menu">
-          <Avatar size="sm">
-            <AvatarFallback>
-              {session.email.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Account menu"
+          className="ml-1 transition-shadow hover:ring-4 hover:ring-foreground/[0.06] aria-expanded:ring-4 aria-expanded:ring-foreground/[0.06]"
+        >
+          <UserAvatar email={session.email} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate font-normal">
-          {session.email}
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuLabel className="flex items-center gap-2.5 py-2 font-normal">
+          <UserAvatar email={session.email} />
+          <span className="min-w-0 truncate text-sm text-foreground">
+            {session.email}
+          </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -79,7 +94,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const hotel = useCurrentHotel()
 
   return (
-    <nav aria-label="Main" className="grid gap-1 px-3">
+    <nav aria-label="Main" className="grid gap-0.5 px-3">
       {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
         <NavLink
           key={label}
@@ -88,10 +103,10 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "flex h-8 items-center gap-2.5 rounded-lg px-2 text-body transition-colors",
               isActive
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+                ? "bg-sidebar-accent text-foreground"
+                : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
             )
           }
         >
@@ -107,8 +122,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
-      <div className="space-y-4 px-4 pt-5 pb-4">
-        <BrandMark className="px-1" />
+      <div className="space-y-4 px-3 pt-5 pb-4">
+        <BrandMark className="px-2" />
         <HotelSwitcher onSwitch={onNavigate} />
       </div>
       <NavLinks onNavigate={onNavigate} />
@@ -152,7 +167,7 @@ export function AppShell({ headerExtras }: { headerExtras?: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-background/95 px-3 backdrop-blur md:px-4">
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 bg-background px-3 md:px-6">
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
             <SheetTrigger asChild>
               <Button
@@ -182,12 +197,12 @@ export function AppShell({ headerExtras }: { headerExtras?: React.ReactNode }) {
           <div className="ml-auto flex items-center gap-1">
             <HouseClock />
             {headerExtras}
-            <UserMenu />
             <ThemeToggle />
+            <UserMenu />
           </div>
         </header>
 
-        <main id="main" className="flex-1 p-4 md:p-6">
+        <main id="main" className="flex-1 px-4 pt-4 pb-10 md:px-8 md:pt-6">
           <Outlet />
         </main>
       </div>

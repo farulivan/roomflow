@@ -74,6 +74,7 @@ const longDate = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
   day: "numeric",
   month: "long",
+  year: "numeric",
 })
 
 export function formatLongDate(date: Date): string {

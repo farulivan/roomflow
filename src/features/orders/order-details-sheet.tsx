@@ -29,16 +29,13 @@ import {
 import { useCurrentHotel } from "@/features/hotels/current-hotel"
 import { track } from "@/lib/analytics"
 import { ApiError } from "@/lib/api-client"
-import {
-  formatDateTime,
-  formatOrderAmount,
-  formatRelativeTime,
-} from "@/lib/format"
+import { formatDateTime, formatRelativeTime } from "@/lib/format"
 import { paths } from "@/lib/paths"
 import { useNow } from "@/lib/use-now"
 
 import { useCollectPayment, useIsOrderUpdating } from "./mutations"
 import { OrderActions } from "./order-actions"
+import { OrderAmount } from "./order-amount"
 import { useOrder } from "./queries"
 
 interface DetailRowProps {
@@ -131,7 +128,8 @@ export function OrderDetailsSheet() {
   return (
     <Sheet open onOpenChange={(open) => !open && close()}>
       <SheetContent
-        className="w-full sm:max-w-md"
+        // Prefixed like the primitive's own side classes, so these win.
+        className="data-[side=right]:w-full data-[side=right]:sm:max-w-md"
         // An in-flight action disables the button that triggered it; the
         // browser then drops focus to <body>, which Radix's dismissable
         // layer reads as "focus left the sheet" and closes it. Escape and
@@ -186,6 +184,19 @@ export function OrderDetailsSheet() {
             />
           )}
 
+          {query.data && (
+            <div className="space-y-2 pb-4">
+              <p className="text-figure">
+                <OrderAmount order={query.data} />
+              </p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <StatusBadge status={query.data.status} />
+                <SlaBadge order={query.data} now={now} />
+                <PaymentBadge status={query.data.paymentStatus} />
+              </div>
+            </div>
+          )}
+
           {query.data && isSlaOverdue(query.data, now) && (
             <Alert className="mb-3 border-alert/40 bg-alert/[0.06]">
               <AlarmClock className="text-alert" />
@@ -204,10 +215,7 @@ export function OrderDetailsSheet() {
           )}
 
           {query.data && (
-            <dl className="divide-y">
-              <DetailRow label="Order ID">
-                <span className="font-mono">{query.data.id}</span>
-              </DetailRow>
+            <dl className="divide-y border-t">
               <DetailRow label="Guest">{query.data.guestName}</DetailRow>
               <DetailRow label="Room">
                 <RoomTag room={query.data.roomNumber} />
@@ -215,11 +223,6 @@ export function OrderDetailsSheet() {
               <DetailRow label="Service">
                 {query.data.service}
                 {query.data.quantity > 1 && ` × ${query.data.quantity}`}
-              </DetailRow>
-              <DetailRow label="Amount">
-                <span className="font-mono">
-                  {formatOrderAmount(query.data.amount)}
-                </span>
               </DetailRow>
               <DetailRow label="Special request">
                 {query.data.specialRequest || (
@@ -231,15 +234,6 @@ export function OrderDetailsSheet() {
                 <span className="text-muted-foreground">
                   ({formatRelativeTime(query.data.orderTime, now)})
                 </span>
-              </DetailRow>
-              <DetailRow label="Status">
-                <div className="flex items-center gap-1.5">
-                  <StatusBadge status={query.data.status} />
-                  <SlaBadge order={query.data} now={now} />
-                </div>
-              </DetailRow>
-              <DetailRow label="Payment">
-                <PaymentBadge status={query.data.paymentStatus} />
               </DetailRow>
             </dl>
           )}

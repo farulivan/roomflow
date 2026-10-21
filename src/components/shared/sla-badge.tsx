@@ -20,7 +20,7 @@ export function SlaBadge({ order, now, className }: SlaBadgeProps) {
   return (
     <Badge
       variant="outline"
-      className={cn("gap-1 border-alert/40 bg-alert/10 text-alert", className)}
+      className={cn("gap-1 border-alert/30 bg-alert/8 text-alert", className)}
       aria-label={`${overdueMinutes} minutes past SLA`}
     >
       <AlarmClock className="size-3" aria-hidden />
