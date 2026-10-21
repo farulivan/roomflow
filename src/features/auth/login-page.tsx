@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form"
 import { Navigate, useLocation, useNavigate, type Location } from "react-router"
 
 import { BrandMark } from "@/components/shared/brand-mark"
+import { Credit } from "@/components/shared/credit"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -63,7 +64,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-4">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
           <BrandMark />
@@ -126,6 +127,7 @@ export function LoginPage() {
           </form>
         </CardContent>
       </Card>
+      <Credit />
     </div>
   )
 }

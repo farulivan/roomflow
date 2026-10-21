@@ -3,6 +3,7 @@ import { ClipboardList, LayoutDashboard, LogOut, Menu } from "lucide-react"
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router"
 
 import { BrandMark } from "@/components/shared/brand-mark"
+import { Credit } from "@/components/shared/credit"
 import { HouseClock } from "@/components/shared/house-clock"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -111,6 +112,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <HotelSwitcher onSwitch={onNavigate} />
       </div>
       <NavLinks onNavigate={onNavigate} />
+      <div className="mt-auto space-y-1 border-t px-5 py-4">
+        <p className="text-xs text-muted-foreground">
+          Demo data ・ resets on reload
+        </p>
+        <Credit />
+      </div>
     </>
   )
 }
