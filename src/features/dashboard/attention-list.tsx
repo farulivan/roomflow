@@ -11,13 +11,6 @@ import { Link } from "react-router"
 
 import { RoomTag } from "@/components/shared/room-tag"
 import { Badge } from "@/components/ui/badge"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import type { Order } from "@/domain/order"
 import type { AttentionItem, AttentionReason } from "@/domain/metrics"
 import { minutesOverdue } from "@/domain/sla"
@@ -30,12 +23,12 @@ interface AttentionListProps {
   now: Date
 }
 
-const reasonBadgeVariants = cva("gap-1 border font-medium", {
+const reasonBadgeVariants = cva("gap-1 border", {
   variants: {
     reason: {
-      sla: "border-alert/40 bg-alert/10 text-alert",
+      sla: "border-alert/30 bg-alert/8 text-alert",
       approval:
-        "border-status-approval/30 bg-status-approval/10 text-status-approval",
+        "border-status-approval/30 bg-status-approval/8 text-status-approval",
       payment: "border-destructive/30 bg-destructive/8 text-destructive",
     } satisfies Record<AttentionReason, string>,
   },
@@ -64,29 +57,30 @@ function reasonLabel(reason: AttentionReason, order: Order, now: Date): string {
  */
 export function AttentionList({ items, now }: AttentionListProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Needs attention</CardTitle>
-        <CardDescription>
+    <section aria-labelledby="attention-heading" className="space-y-3">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h2 id="attention-heading" className="text-section">
+          Needs attention
+        </h2>
+        <p className="text-sm text-muted-foreground">
           Overdue, awaiting approval, or payment issues
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {items.length === 0 ? (
-          <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-            <CheckCircle2 className="size-4 text-status-done" aria-hidden />
-            All clear. Nothing needs attention right now.
-          </div>
-        ) : (
-          <div className="divide-y">
-            {items.map(({ order, reason }) => {
-              const Icon = REASON_ICON[reason]
+        </p>
+      </div>
+      {items.length === 0 ? (
+        <div className="flex items-center gap-2 border-y py-4 text-sm text-muted-foreground">
+          <CheckCircle2 className="size-4 text-status-done" aria-hidden />
+          All clear. Nothing needs attention right now.
+        </div>
+      ) : (
+        <ul className="divide-y border-y">
+          {items.map(({ order, reason }) => {
+            const Icon = REASON_ICON[reason]
 
-              return (
+            return (
+              <li key={order.id}>
                 <Link
-                  key={order.id}
                   to={paths.order(order.hotelId, order.id)}
-                  className="-mx-2 flex items-center justify-between gap-3 rounded px-2 py-2 hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  className="flex h-12 items-center justify-between gap-3 px-2 text-sm transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <Badge
@@ -96,10 +90,8 @@ export function AttentionList({ items, now }: AttentionListProps) {
                       <Icon className="size-3" aria-hidden />
                       {reasonLabel(reason, order, now)}
                     </Badge>
-                    <span className="shrink-0 font-mono text-sm">
-                      {order.id}
-                    </span>
-                    <span className="truncate text-sm">{order.guestName}</span>
+                    <span className="shrink-0 font-mono">{order.id}</span>
+                    <span className="truncate">{order.guestName}</span>
                     <RoomTag
                       room={order.roomNumber}
                       className="hidden shrink-0 sm:inline-flex"
@@ -110,11 +102,11 @@ export function AttentionList({ items, now }: AttentionListProps) {
                     <ChevronRight className="size-4" aria-hidden />
                   </div>
                 </Link>
-              )
-            })}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
   )
 }

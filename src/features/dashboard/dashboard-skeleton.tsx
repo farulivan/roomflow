@@ -6,17 +6,19 @@ import { Skeleton } from "@/components/ui/skeleton"
  */
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }, (_, index) => (
-          <Skeleton key={index} className="h-28 rounded-xl" />
-        ))}
+    <div className="mx-auto w-full max-w-5xl space-y-10">
+      <div className="grid gap-4 lg:grid-cols-5">
+        <Skeleton className="h-80 rounded-xl lg:col-span-3" />
+        <Skeleton className="h-80 rounded-xl lg:col-span-2" />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Skeleton className="h-72 rounded-xl" />
-        <Skeleton className="h-72 rounded-xl" />
+      <div className="space-y-3">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-48 rounded-xl" />
       </div>
-      <Skeleton className="h-64 rounded-xl" />
+      <div className="space-y-3">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
     </div>
   )
 }
