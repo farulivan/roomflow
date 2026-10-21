@@ -1,20 +1,26 @@
 ## What
 
-<!-- What changes, in one or two sentences. -->
+<!-- The change in a few sentences: what it does and what it leaves alone. A table helps when several things move at once. -->
 
 ## Why
 
-<!-- The problem or goal behind it. -->
+<!-- The problem or goal behind it, with the evidence: an issue, an error message, a measurement. Link issues as #12. -->
 
-## How to test
+## How
 
-1.
+<!-- The approach, and anything a reviewer would otherwise ask about: the commands used, why this option over the obvious one, what was ruled out. -->
 
-## Screenshots
+## Verification
 
-<!-- UI changes only: before and after. Delete otherwise. -->
+<!-- What ran and what it showed. Tick only what actually ran. Add before/after screenshots for UI changes. -->
 
-## Checklist
+- [ ] `bun run format:check && bun run lint && bun run spell && bun run typecheck && bun test && bun run build`
+- [ ] Checked in the browser (or why not)
 
-- [ ] Format, lint, spell, typecheck, test and build all pass
-- [ ] Docs updated if behavior changed
+## Not in this PR
+
+<!-- Related things deliberately left out, and where they go next. Delete the section if there are none. -->
+
+## Architecture / decisions
+
+<!-- "Decision: none." or the decision made and the alternatives considered. -->
