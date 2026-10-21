@@ -242,6 +242,7 @@ Zod schemas are the single source of truth, and form types are derived with `z.i
   - confirmed actions don't touch the cache before the server answers
   - the shared clock runs one timer
   - acknowledging an order with a declined payment asks first, and collecting a payment rolls back only that order on failure
+  - the row menu offers "Mark payment collected" while a payment is owed, including on completed orders, and has no menu once nothing is left to do
   - which actions render for each status
 
 ## Accessibility
