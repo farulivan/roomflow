@@ -261,6 +261,7 @@ The app is a static build, served by Cloudflare Workers with no Worker script (`
 - **Caching:** `public/_headers` marks the fingerprinted files in `/assets` as immutable for a year. `index.html` and the service worker always revalidate, so a new deploy shows up on the next load.
 - **Addresses:** the custom domain is the only public address. Each uploaded version also gets its own `workers.dev` preview URL for checking a change before it goes live.
 - **Releases:** Cloudflare builds and deploys every push to `main`. `bun run deploy` does the same by hand from a local `dist/`.
+- **Branch previews:** every push to any other branch runs `wrangler preview`, which gives the branch its own Preview URL and posts it on the pull request. It needs the `previews` block in `wrangler.jsonc`, empty because a preview uses the same settings as production.
 
 ## Performance and scale
 
