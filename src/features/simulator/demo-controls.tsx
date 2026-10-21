@@ -61,8 +61,13 @@ export function DemoControls() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Demo controls">
-          <FlaskConical className="size-4" />
+        <Button
+          variant="ghost"
+          aria-label="Demo controls"
+          className="text-muted-foreground"
+        >
+          <FlaskConical />
+          <span className="hidden sm:inline">Demo</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end">

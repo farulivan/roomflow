@@ -67,8 +67,8 @@ export function LoginPage() {
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
-          <BrandMark />
-          <CardTitle className="mt-2">Sign in</CardTitle>
+          <BrandMark className="justify-center" />
+          <CardTitle className="mt-2 text-section">Sign in</CardTitle>
           <CardDescription>
             Guest requests for every hotel you work in, in one place.
           </CardDescription>
