@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --color-brass: var(--brass);
+  --color-brass-ink: var(--brass-ink);
+  --color-alert: var(--alert);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-status-acknowledged: var(--status-acknowledged);
+  --color-status-progress: var(--status-progress);
+  --color-status-approval: var(--status-approval);
+  --color-status-done: var(--status-done);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * Roomflow theme — evergreen and brass on cool paper.
+ *
+ * Evergreen is the brand and the "act on this" color (primary buttons, the
+ * New status). Brass is rationed to the key-tag room chips, the logo, the
+ * Complete action and pending payments, so it always means something.
+ * Orange (alert) is only ever an SLA or a stale-data warning; red
+ * (destructive) only a cancel or a failed payment.
+ */
+:root {
+  --background: #f7f8f6;
+  --foreground: #18211e;
+  --card: #ffffff;
+  --card-foreground: #18211e;
+  --popover: #ffffff;
+  --popover-foreground: #18211e;
+  --primary: #1f4a3f;
+  --primary-foreground: #f7f8f6;
+  --secondary: #edf1ee;
+  --secondary-foreground: #1f2b27;
+  --muted: #edf1ee;
+  --muted-foreground: #56625d;
+  --accent: #e4ece7;
+  --accent-foreground: #173a31;
+  --destructive: #b42318;
+  --border: #dde3df;
+  --input: #d3dbd6;
+  --ring: #2f6b5b;
+  --brass: #b8893b;
+  --brass-ink: #74511a;
+  --alert: #c2410c;
+  --success: #b8893b;
+  --success-foreground: #18211e;
+  --status-acknowledged: #3d5a80;
+  --status-progress: #1d6a85;
+  --status-approval: #74478a;
+  --status-done: #1f4a3f;
+  --chart-1: #1f4a3f;
+  --chart-2: #b8893b;
+  --chart-3: #5f8f80;
+  --chart-4: #c9b27e;
+  --chart-5: #8a9a94;
+  --radius: 0.5rem;
+  --sidebar: #eef2ef;
+  --sidebar-foreground: #18211e;
+  --sidebar-primary: #1f4a3f;
+  --sidebar-primary-foreground: #f7f8f6;
+  --sidebar-accent: #dfe8e3;
+  --sidebar-accent-foreground: #173a31;
+  --sidebar-border: #dde3df;
+  --sidebar-ring: #2f6b5b;
+}
+
+.dark {
+  --background: #101614;
+  --foreground: #e6ebe8;
+  --card: #161e1b;
+  --card-foreground: #e6ebe8;
+  --popover: #19221f;
+  --popover-foreground: #e6ebe8;
+  --primary: #8fcbb5;
+  --primary-foreground: #0d1a16;
+  --secondary: #1e2825;
+  --secondary-foreground: #e6ebe8;
+  --muted: #1e2825;
+  --muted-foreground: #9aa7a2;
+  --accent: #22302b;
+  --accent-foreground: #e6ebe8;
+  --destructive: #f07b6e;
+  --border: #ffffff1a;
+  --input: #ffffff24;
+  --ring: #6fb39b;
+  --brass: #d4a65a;
+  --brass-ink: #e8c27f;
+  --alert: #f0894b;
+  --success: #d4a65a;
+  --success-foreground: #18211e;
+  --status-acknowledged: #9db4d8;
+  --status-progress: #7cc4dc;
+  --status-approval: #c9a3d9;
+  --status-done: #8fcbb5;
+  --chart-1: #8fcbb5;
+  --chart-2: #d4a65a;
+  --chart-3: #5f8f80;
+  --chart-4: #8a7650;
+  --chart-5: #6b7a74;
+  --sidebar: #0c1210;
+  --sidebar-foreground: #e6ebe8;
+  --sidebar-primary: #8fcbb5;
+  --sidebar-primary-foreground: #0d1a16;
+  --sidebar-accent: #1c2723;
+  --sidebar-accent-foreground: #e6ebe8;
+  --sidebar-border: #ffffff1a;
+  --sidebar-ring: #6fb39b;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Motion is decoration here; spinners keep turning because they carry meaning. */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
