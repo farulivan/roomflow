@@ -1,2 +1,8 @@
+[install]
+# Skip package versions published less than three days ago. Most
+# malicious releases are found and pulled within that time. To take an
+# urgent fix sooner, pass --minimum-release-age=0 to that one install.
+minimumReleaseAge = 259200
+
 [test]
 preload = ["./src/test/happydom.ts", "./src/test/setup.ts"]
