@@ -164,3 +164,7 @@ I build with [Claude Code](https://claude.com/claude-code) as an assistant. I se
 - Cancel and reject reasons are sent to the API but not stored or shown anywhere.
 - All amounts are in USD. There's no per-hotel currency.
 - There are no roles: every signed-in user can approve extra beds and mark payments collected.
+
+## License
+
+[MIT](LICENSE)
