@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    # Monthly keeps routine bumps to a couple of pull requests a month.
+    # Security fixes don't wait for this: they open as soon as an
+    # advisory is published.
+    schedule:
+      interval: monthly
+    # Waits a week after a release before proposing it. Most malicious
+    # releases are found and pulled within days, and a routine bump
+    # loses nothing by waiting.
+    cooldown:
+      default-days: 7
+    # Minor and patch bumps arrive together in one pull request. Majors
+    # still come one at a time, since they are the ones that break. The
+    # short group name keeps the commit subject within 50 characters.
+    groups:
+      minor:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: build(deps)
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci(deps)

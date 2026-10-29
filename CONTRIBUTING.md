@@ -8,6 +8,14 @@ Pull requests land as **merge commits**, so every commit on the branch stays in 
 
 The pull request title follows the same commit format and is at most **44 characters**. It becomes the merge commit's subject with ` (#123)` appended, and the result has to stay within 50.
 
+`main` only changes through pull requests. A pull request can merge once CI passes and code scanning finds no new high-severity issue.
+
+## Dependency updates
+
+Dependabot opens one pull request a month for minor and patch bumps, one for each major bump, and one as soon as a security advisory affects a dependency. Shorten its title to 44 characters before merging if it runs over. Its commits keep GitHub's own message format, the one exception to the rules below.
+
+New releases have to age before they come in. Dependabot waits a week before proposing one, and `bunfig.toml` keeps installs from taking a version less than three days old. Most malicious releases are pulled within that time. To take an urgent fix sooner, run `bun add <package> --minimum-release-age=0`.
+
 ## Commit messages
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org):
