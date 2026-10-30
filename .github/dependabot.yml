@@ -3,8 +3,8 @@ updates:
   - package-ecosystem: bun
     directory: /
     # Monthly keeps routine bumps to a couple of pull requests a month.
-    # Security fixes don't wait for this: they open as soon as an
-    # advisory is published.
+    # Dependabot can't open security fixes for Bun, so the audit job in
+    # CI is what flags a vulnerable package.
     schedule:
       interval: monthly
     # Waits a week after a release before proposing it. Most malicious

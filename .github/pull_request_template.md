@@ -14,7 +14,7 @@
 
 <!-- What ran and what it showed. Tick only what actually ran. Add before/after screenshots for UI changes. -->
 
-- [ ] `bun run format:check && bun run lint && bun run spell && bun run typecheck && bun test && bun run build`
+- [ ] `bun run format:check && bun run lint && bun run spell && bun run typecheck && bun test && bun run build && bun audit --audit-level=high`
 - [ ] Checked in the browser (or why not)
 
 ## Not in this PR

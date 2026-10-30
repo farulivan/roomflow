@@ -12,7 +12,9 @@ The pull request title follows the same commit format and is at most **44 charac
 
 ## Dependency updates
 
-Dependabot opens one pull request a month for minor and patch bumps, one for each major bump, and one as soon as a security advisory affects a dependency. Shorten its title to 44 characters before merging if it runs over. Its commits keep GitHub's own message format, the one exception to the rules below.
+Dependabot opens one pull request a month for minor and patch bumps and one for each major bump. It opens security fixes right away for GitHub Actions, but it can't for Bun packages. Shorten its title to 44 characters before merging if it runs over. Its commits keep GitHub's own message format, the one exception to the rules below.
+
+GitHub's security alerts only see the packages listed in `package.json`, because its dependency graph doesn't read `bun.lock`. CI runs `bun audit` on the whole lockfile for every pull request and once a week, and fails on a high or critical advisory. When it does, `bun update` moves the packages you list. To refresh the ones underneath them too, delete `bun.lock`, run `bun install`, then run the checks below.
 
 New releases have to age before they come in. Dependabot waits a week before proposing one, and `bunfig.toml` keeps installs from taking a version less than three days old. Most malicious releases are pulled within that time. To take an urgent fix sooner, run `bun add <package> --minimum-release-age=0`.
 
@@ -49,5 +51,5 @@ The repo's VS Code settings flag a subject over 50 characters or a body line ove
 Run the same checks CI runs:
 
 ```bash
-bun run format:check && bun run lint && bun run spell && bun run typecheck && bun test && bun run build
+bun run format:check && bun run lint && bun run spell && bun run typecheck && bun test && bun run build && bun audit --audit-level=high
 ```
