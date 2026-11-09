@@ -46,6 +46,50 @@ docs: explain the hotel switcher
 
 The repo's VS Code settings flag a subject over 50 characters or a body line over 72 while you type.
 
+## Screenshots
+
+The README images in `docs/images/` are captures of the live site. Retake them when the UI they show changes, with Playwright's CLI driving your installed Chrome. Nothing gets added to the project.
+
+Save this outside the repo, for example as `/tmp/roomflow-state.json`. It signs you in and turns off the automatic orders, so no toast lands in a shot:
+
+```json
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "https://roomflow.farulivan.com",
+      "localStorage": [
+        {
+          "name": "roomflow.session",
+          "value": "{\"email\":\"staff@roomflow.example\"}"
+        },
+        { "name": "roomflow.demo-settings", "value": "{\"autoOrders\":false}" }
+      ]
+    }
+  ]
+}
+```
+
+Then take each image from the repo root:
+
+```bash
+bunx playwright@1.64.1 screenshot --channel chrome \
+  --load-storage /tmp/roomflow-state.json --wait-for-timeout 3000 \
+  --device "Desktop Chrome HiDPI" --viewport-size "1280, 800" \
+  --color-scheme light \
+  https://roomflow.farulivan.com/hotels/harborline \
+  docs/images/dashboard-light.jpg
+```
+
+| File                  | Path from the site                  | Change to the command above                     |
+| --------------------- | ----------------------------------- | ----------------------------------------------- |
+| `dashboard-light.jpg` | `/hotels/harborline`                | none                                            |
+| `dashboard-dark.jpg`  | `/hotels/harborline`                | `--color-scheme dark`                           |
+| `order-drawer.jpg`    | `/hotels/harborline/orders/HL-1311` | none                                            |
+| `mobile.jpg`          | `/hotels/harborline/orders`         | `--device "Pixel 7" --viewport-size "412, 720"` |
+
+`public/og.jpg` is the 1280×640 card that link previews show. It's a designed card built around the light dashboard shot, and the same file is the repository's social preview (Settings → General → Social preview). Upload it there again whenever it changes.
+
 ## Before pushing
 
 Run the same checks CI runs:
