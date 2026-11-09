@@ -185,7 +185,9 @@ Query hooks, components and the domain don't change.
 | Preferences  | `localStorage`, checked on read | session, theme, demo settings, last-used hotel             |
 | UI state     | component state                 | open dialogs, the search draft, the order awaiting confirm |
 
-**Query keys** start with the hotel, so each hotel has its own cache:
+Typing in the search box replaces the current history entry, and a filter change adds one, so Back undoes filters, not keystrokes.
+
+**Query keys** start with the hotel, so each hotel has its own cache and switching back to one is instant:
 
 - `["hotels"]`
 - `["orders", hotelId, "list", params]`
